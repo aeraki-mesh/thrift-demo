@@ -1,0 +1,8 @@
+FROM openjdk
+
+ENV helloServer="thrift-sample-server"
+
+RUN mkdir hello-libs
+COPY *.jar hello-libs/
+ENTRYPOINT java -cp "hello-libs/*" HelloClient $helloServer
+

@@ -1,0 +1,4 @@
+FROM openjdk
+RUN mkdir hello-libs
+COPY *.jar hello-libs/
+ENTRYPOINT java -cp "hello-libs/*" HelloServer
