@@ -4,7 +4,7 @@ DOCKER_TMP?=$(OUT)/docker_temp/
 DOCKER_SERVER_TAG?=aeraki/thrift-sample-server:latest
 DOCKER_CLIENT_TAG?=aeraki/thrift-sample-client:latest
 
-build:
+Abuild:
 	mvn install
 docker-build: build
 	rm -rf $(DOCKER_TMP)

@@ -18,24 +18,35 @@ import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
 
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
+
 public class HelloClient {
     private static HelloService.Client client;
     private static TTransport transport;
-    private static String serverHost = "localhost";
+    public static String serverHost = "localhost";
 
     public static void main(String[] args) {
+        startTestServer();
+
         if (args.length > 0) {
             serverHost = args[0];
         }
         connectServer();
-        while (true) {
-            try {
-                Thread.sleep(5000);
-                String response = client.sayHello("Aeraki");
-                System.out.println(response);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                connectServer();
+
+        if(args.length>1 && args[1].equals("demo")) {
+            System.out.println("Periodically call thrift server");
+            while (true) {
+                try {
+                    Thread.sleep(5000);
+                    String response = client.sayHello("Aeraki");
+                    System.out.println(response);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    connectServer();
+                }
             }
         }
     }
@@ -59,5 +70,31 @@ public class HelloClient {
                 x.printStackTrace();
             }
         }
+    }
+
+    /**
+     * startTestServer starts a HTTP server for e2e test
+     */
+    static void startTestServer() {
+        Thread serverThread = new Thread(){
+            public void run(){
+                System.out.println("Start a http server for e2e test");
+                int port = 9009;
+                Server server = new Server(port);
+                ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+                context.setContextPath("/");
+                ServletHolder h = new ServletHolder(new HttpServletDispatcher());
+                h.setInitParameter("javax.ws.rs.Application", "com.embedded.Services");
+                context.addServlet(h, "/*");
+                server.setHandler(context);
+                try {
+                    server.start();
+                    server.join();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        serverThread.start();
     }
 }

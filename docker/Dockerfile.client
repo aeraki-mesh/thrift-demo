@@ -1,7 +1,8 @@
 FROM openjdk
 
 ENV helloServer="thrift-sample-server"
+ENV mode=""
 
 COPY aeraki_thrift_example-1.0-SNAPSHOT.jar ./
-ENTRYPOINT java -cp aeraki_thrift_example-1.0-SNAPSHOT.jar org.aeraki.HelloClient $helloServer
+ENTRYPOINT java -cp aeraki_thrift_example-1.0-SNAPSHOT.jar org.aeraki.HelloClient $helloServer $mode
 

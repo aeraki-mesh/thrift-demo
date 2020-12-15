@@ -67,6 +67,8 @@ spec:
           env:
             - name: helloServer
               value: "thrift-sample-server"
+            - name: mode
+              value: "demo"
 ---
 apiVersion: v1
 kind: Service
