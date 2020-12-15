@@ -2,7 +2,6 @@ FROM openjdk
 
 ENV helloServer="thrift-sample-server"
 
-RUN mkdir hello-libs
-COPY *.jar hello-libs/
-ENTRYPOINT java -cp "hello-libs/*" HelloClient $helloServer
+COPY aeraki_thrift_example-1.0-SNAPSHOT.jar ./
+ENTRYPOINT java -cp aeraki_thrift_example-1.0-SNAPSHOT.jar org.aeraki.HelloClient $helloServer
 

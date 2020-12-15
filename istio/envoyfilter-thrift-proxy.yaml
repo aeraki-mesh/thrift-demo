@@ -35,4 +35,33 @@ spec:
                       weight: 30
                     - name: "outbound|9090|v2|thrift-sample-server.thrift.svc.cluster.local"
                       weight: 70
-                  "total_weight": 100
+  - applyTo: NETWORK_FILTER
+    match:
+      listener:
+        name: virtualInbound
+        filterChain:
+          filter:
+            name: "envoy.filters.network.tcp_proxy"
+    patch:
+      operation: REPLACE
+      value:
+        name: envoy.filters.network.thrift_proxy
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.filters.network.thrift_proxy.v3.ThriftProxy
+          stat_prefix: "outbound|9090||thrift-sample-server.thrift.svc.cluster.local"
+          transport: AUTO_TRANSPORT
+          protocol: AUTO_PROTOCOL
+          thrift_filters:
+          - name: envoy.filters.thrift.router
+          route_config:
+            routes:
+            - match:
+                # empty string matches any request method name
+                method_name: ""
+              route:
+                weighted_clusters:
+                  clusters:
+                    - name: "outbound|9090|v1|thrift-sample-server.thrift.svc.cluster.local"
+                      weight: 30
+                    - name: "outbound|9090|v2|thrift-sample-server.thrift.svc.cluster.local"
+                      weight: 70      

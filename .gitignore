@@ -3,3 +3,4 @@ gen-java
 target
 debug
 .idea
+dependency-reduced-pom.xml
