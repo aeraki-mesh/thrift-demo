@@ -8,7 +8,7 @@ spec:
   - applyTo: NETWORK_FILTER
     match:
       listener:
-        name: ${thrift-sample-server-vip}_9090     # sed -i .bak "s/\${thrift-sample-server-vip}/`kubectl get svc thrift-sample-server -n thrift -o=jsonpath='{.spec.clusterIP}'`/" istio/envoyfilter-thrift-proxy.yaml
+        name: ${thrift-sample-server-vip}_9090    # sed -i .bak "s/\${thrift-sample-server-vip}/`kubectl get svc thrift-sample-server -n thrift -o=jsonpath='{.spec.clusterIP}'`/" istio/envoyfilter-thrift-proxy.yaml
         filterChain:
           filter:
             name: "envoy.filters.network.tcp_proxy"
@@ -40,6 +40,7 @@ spec:
       listener:
         name: virtualInbound
         filterChain:
+          destination_port: 9090
           filter:
             name: "envoy.filters.network.tcp_proxy"
     patch:
@@ -48,7 +49,7 @@ spec:
         name: envoy.filters.network.thrift_proxy
         typed_config:
           "@type": type.googleapis.com/envoy.extensions.filters.network.thrift_proxy.v3.ThriftProxy
-          stat_prefix: "outbound|9090||thrift-sample-server.thrift.svc.cluster.local"
+          stat_prefix: inbound|9090||
           transport: AUTO_TRANSPORT
           protocol: AUTO_PROTOCOL
           thrift_filters:
@@ -59,9 +60,4 @@ spec:
                 # empty string matches any request method name
                 method_name: ""
               route:
-                weighted_clusters:
-                  clusters:
-                    - name: "outbound|9090|v1|thrift-sample-server.thrift.svc.cluster.local"
-                      weight: 30
-                    - name: "outbound|9090|v2|thrift-sample-server.thrift.svc.cluster.local"
-                      weight: 70
+                cluster: inbound|9090||
